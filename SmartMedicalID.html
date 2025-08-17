@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Health Record</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            background-color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(to right, #fb923c, #ef4444, #ec4899);
+            color: white;
+            padding: 24px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #ea580c;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .edit-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #2563eb;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .edit-btn:hover {
+            color: #1d4ed8;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .profile-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            font-size: 14px;
+        }
+
+        .profile-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .profile-label {
+            color: #6b7280;
+        }
+
+        .profile-value {
+            font-weight: 500;
+        }
+
+        .profile-value.bmi {
+            color: #ea580c;
+        }
+
+        .profile-value.blood {
+            color: #dc2626;
+        }
+
+        .input {
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input:focus {
+            border-color: #ea580c;
+            box-shadow: 0 0 0 1px #ea580c;
+        }
+
+        .conditions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .condition-card {
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .condition-card:hover {
+            background: #f3f4f6;
+            border-color: rgba(251, 146, 60, 0.3);
+            transform: scale(1.02);
+        }
+
+        .condition-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+            display: block;
+            transition: transform 0.2s;
+        }
+
+        .condition-card:hover .condition-icon {
+            transform: scale(1.1);
+        }
+
+        .condition-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .form-actions {
+            grid-column: span 2;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #ea580c;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-ghost {
+            background: none;
+            color: #6b7280;
+        }
+
+        .btn-ghost:hover {
+            color: #374151;
+        }
+
+        .medicine-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .medicine-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .medicine-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .medicine-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .medicine-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+        }
+
+        .medicine-details h3 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .medicine-meta {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .medicine-condition {
+            color: #ea580c;
+            font-size: 14px;
+        }
+
+        .medicine-dates {
+            text-align: right;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 12px;
+            padding: 48px;
+            text-align: center;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-icon {
+            width: 48px;
+            height: 48px;
+            color: #d1d5db;
+            margin: 0 auto 16px;
+        }
+
+        .empty-text {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .empty-link {
+            color: #ea580c;
+            cursor: pointer;
+        }
+
+        .empty-link:hover {
+            color: #dc2626;
+        }
+
+        .conditions-display {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .condition-display-item {
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .condition-display-icon {
+            font-size: 32px;
+        }
+
+        .condition-display-info h3 {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .condition-display-status {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .health-summary {
+            background: white;
+            margin: 24px;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            text-align: center;
+        }
+
+        .summary-item {
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .summary-item.blue {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .summary-item.green {
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .summary-item.orange {
+            background: rgba(251, 146, 60, 0.1);
+        }
+
+        .summary-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .summary-number.blue {
+            color: #2563eb;
+        }
+
+        .summary-number.green {
+            color: #10b981;
+        }
+
+        .summary-number.orange {
+            color: #ea580c;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-display {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .conditions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .conditions-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <div class="header-icon">
+                        <i data-lucide="heart"></i>
+                    </div>
+                    <div>
+                        <h1 class="title">Smart Health Record</h1>
+                        <p class="subtitle">Complete health overview at a glance</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="add-medicine">Add Medicine</button>
+                <button class="tab-btn" data-tab="my-medicines">My Medicines</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Add Medicine Tab -->
+            <div id="add-medicine" class="tab-content">
+                <!-- Patient Profile Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i data-lucide="user"></i>
+                            Patient Profile
+                        </h2>
+                        <button class="edit-btn" onclick="toggleProfileEdit()">
+                            <i data-lucide="edit-3"></i>
+                            <span id="edit-text">Edit</span>
+                        </button>
+                    </div>
+                    
+                    <div id="profile-display" class="profile-display">
+                        <div class="profile-item">
+                            <span class="profile-label">Name:</span>
+                            <span class="profile-value" id="display-name">Not set</span>
+                        </div>
+                        <div class="profile-item">
+                            <span class="profile-label">Age:</span>
+                            <span class="profile-value" id="display-age">Not set</span>
+                        </div>
+                        <div class="profile-item">
+                            <span class="profile-label">BMI:</span>
+                            <span class="profile-value bmi" id="display-bmi">N/A</span>
+                        </div>
+                        <div class="profile-item">
+                            <span class="profile-label">Height:</span>
+                            <span class="profile-value" id="display-height">Not set</span>
+                        </div>
+                        <div class="profile-item">
+                            <span class="profile-label">Weight:</span>
+                            <span class="profile-value" id="display-weight">Not set</span>
+                        </div>
+                        <div class="profile-item">
+                            <span class="profile-label">Blood:</span>
+                            <span class="profile-value blood" id="display-blood">Not set</span>
+                        </div>
+                    </div>
+                    
+                    <div id="profile-edit" class="profile-grid hidden">
+                        <input type="text" id="input-name" class="input" placeholder="Full Name">
+                        <input type="number" id="input-age" class="input" placeholder="Age">
+                        <input type="number" id="input-height" class="input" placeholder="Height (cm)">
+                        <input type="number" id="input-weight" class="input" placeholder="Weight (kg)">
+                        <select id="input-blood" class="input">
+                            <option value="">Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                        <select id="input-gender" class="input">
+                            <option value="">Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div style="grid-column: span 2;">
+                            <input type="tel" id="input-contact" class="input" placeholder="Emergency Contact" style="width: 100%;">
+                        </div>
+                        <div style="grid-column: span 2; display: flex; justify-content: flex-end;">
+                            <button class="btn btn-success" onclick="saveProfile()">
+                                <i data-lucide="save"></i>
+                                Save Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add New Medicine Section -->
+                <div class="section">
+                    <h2 class="section-title">Add New Medicine</h2>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">Select Condition:</p>
+                    
+                    <!-- Condition Grid -->
+                    <div class="conditions-grid">
+                        <div class="condition-card" onclick="selectCondition('Diabetes', '🩺')">
+                            <span class="condition-icon">🩺</span>
+                            <p class="condition-name">Diabetes</p>
+                        </div>
+                        <div class="condition-card" onclick="selectCondition('Blood Pressure', '❤️')">
+                            <span class="condition-icon">❤️</span>
+                            <p class="condition-name">Blood Pressure</p>
+                        </div>
+                        <div class="condition-card" onclick="selectCondition('Cholesterol', '🧪')">
+                            <span class="condition-icon">🧪</span>
+                            <p class="condition-name">Cholesterol</p>
+                        </div>
+                        <div class="condition-card" onclick="selectCondition('Thyroid', '🦋')">
+                            <span class="condition-icon">🦋</span>
+                            <p class="condition-name">Thyroid</p>
+                        </div>
+                    </div>
+
+                    <!-- Medicine Form -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Medicine Name</label>
+                        <input type="text" id="medicine-name" class="input" placeholder="Enter medicine name" style="width: 100%;">
+                    </div>
+
+                    <!-- Additional Medicine Details -->
+                    <div id="medicine-form" class="form-grid hidden">
+                        <input type="text" id="medicine-dosage" class="input" placeholder="Dosage (e.g., 500mg)">
+                        <select id="medicine-frequency" class="input">
+                            <option value="">Select Frequency</option>
+                            <option value="Once daily">Once daily</option>
+                            <option value="Twice daily">Twice daily</option>
+                            <option value="Three times daily">Three times daily</option>
+                            <option value="Every 6 hours">Every 6 hours</option>
+                            <option value="As needed">As needed</option>
+                        </select>
+                        <input type="date" id="medicine-date" class="input">
+                        <input type="text" id="medicine-notes" class="input" placeholder="Notes (optional)">
+                        <div class="form-actions">
+                            <button class="btn btn-ghost" onclick="cancelMedicineForm()">Cancel</button>
+                            <button class="btn btn-primary" onclick="addMedicine()">
+                                <i data-lucide="plus"></i>
+                                Add Medicine
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Conditions Overview -->
+                <div id="conditions-section" class="section hidden">
+                    <h2 class="section-title">
+                        <i data-lucide="activity"></i>
+                        Current Health Conditions
+                    </h2>
+                    <div id="conditions-display" class="conditions-display">
+                        <!-- Conditions will be added dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Medicines Tab -->
+            <div id="my-medicines" class="tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="font-size: 20px; font-weight: 600;">My Medicines (<span id="medicine-count">0</span>)</h2>
+                    <button class="btn btn-primary" onclick="switchTab('add-medicine')">
+                        <i data-lucide="plus"></i>
+                        Add New
+                    </button>
+                </div>
+
+                <div id="medicines-list">
+                    <div class="empty-state">
+                        <i data-lucide="heart" class="empty-icon"></i>
+                        <p class="empty-text">No medicines added yet</p>
+                        <span class="empty-link" onclick="switchTab('add-medicine')">Add your first medicine</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Summary Footer -->
+        <div class="health-summary">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="alert-circle" style="color: #2563eb;"></i>
+                Health Summary
+            </h3>
+            <div class="summary-grid">
+                <div class="summary-item blue">
+                    <p class="summary-number blue" id="conditions-count">0</p>
+                    <p class="summary-label">Health Conditions</p>
+                </div>
+                <div class="summary-item green">
+                    <p class="summary-number green" id="medications-count">0</p>
+                    <p class="summary-label">Active Medications</p>
+                </div>
+                <div class="summary-item orange">
+                    <p class="summary-number orange" id="bmi-display">N/A</p>
+                    <p class="summary-label">Current BMI</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // App State
+        let patientProfile = {
+            name: '', age: '', height: '', weight: '', bloodGroup: '', gender: '', emergencyContact: ''
+        };
+        let healthConditions = [];
+        let medicines = [];
+        let selectedCondition = '';
+
+        // Tab Management
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.remove('hidden');
+        }
+
+        // Tab event listeners
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        // Profile Management
+        function toggleProfileEdit() {
+            const display = document.getElementById('profile-display');
+            const edit = document.getElementById('profile-edit');
+            const editText = document.getElementById('edit-text');
+            
+            if (display.classList.contains('hidden')) {
+                // Switch to display mode
+                display.classList.remove('hidden');
+                edit.classList.add('hidden');
+                editText.textContent = 'Edit';
+            } else {
+                // Switch to edit mode
+                display.classList.add('hidden');
+                edit.classList.remove('hidden');
+                editText.textContent = 'Save';
+                
+                // Populate edit form
+                document.getElementById('input-name').value = patientProfile.name;
+                document.getElementById('input-age').value = patientProfile.age;
+                document.getElementById('input-height').value = patientProfile.height;
+                document.getElementById('input-weight').value = patientProfile.weight;
+                document.getElementById('input-blood').value = patientProfile.bloodGroup;
+                document.getElementById('input-gender').value = patientProfile.gender;
+                document.getElementById('input-contact').value = patientProfile.emergencyContact;
+            }
+        }
+
+        function saveProfile() {
+            patientProfile = {
+                name: document.getElementById('input-name').value,
+                age: document.getElementById('input-age').value,
+                height: document.getElementById('input-height').value,
+                weight: document.getElementById('input-weight').value,
+                bloodGroup: document.getElementById('input-blood').value,
+                gender: document.getElementById('input-gender').value,
+                emergencyContact: document.getElementById('input-contact').value
+            };
+            
+            updateProfileDisplay();
+            toggleProfileEdit();
+        }
+
+        function updateProfileDisplay() {
+            document.getElementById('display-name').textContent = patientProfile.name || 'Not set';
+            document.getElementById('display-age').textContent = patientProfile.age || 'Not set';
+            document.getElementById('display-height').textContent = patientProfile.height ? patientProfile.height + ' cm' : 'Not set';
+            document.getElementById('display-weight').textContent = patientProfile.weight ? patientProfile.weight + ' kg' : 'Not set';
+            document.getElementById('display-blood').textContent = patientProfile.bloodGroup || 'Not set';
+            
+            const bmi = calculateBMI();
+            document.getElementById('display-bmi').textContent = bmi;
+            document.getElementById('bmi-display').textContent = bmi;
+        }
+
+        function calculateBMI() {
+            if (patientProfile.height && patientProfile.weight) {
+                const heightInM = parseFloat(patientProfile.height) / 100;
+                const weightInKg = parseFloat(patientProfile.weight);
+                return (weightInKg / (heightInM * heightInM)).toFixed(1);
+            }
+            return 'N/A';
+        }
+
+        // Condition Selection
+        function selectCondition(conditionName, icon) {
+            selectedCondition = conditionName;
+            
+            // Add condition if not exists
+            if (!healthConditions.find(c => c.name === conditionName)) {
+                healthConditions.push({
+                    id: Date.now(),
+                    name: conditionName,
+                    icon: icon,
+                    diagnosed: new Date().getFullYear().toString(),
+                    status: 'Newly Added'
+                });
+                updateConditionsDisplay();
+            }
+            
+            // Set condition in form and show form
+            document.getElementById('medicine-form').classList.remove('hidden');
+        }
+
+        function updateConditionsDisplay() {
+            const display = document.getElementById('conditions-display');
+            const section = document.getElementById('conditions-section');
+            
+            if (healthConditions.length > 0) {
+                section.classList.remove('hidden');
+                display.innerHTML = healthConditions.map(condition => `
+                    <div class="condition-display-item">
+                        <span class="condition-display-icon">${condition.icon}</span>
+                        <div class="condition-display-info">
+                            <h3>${condition.name}</h3>
+                            <p class="condition-display-status">${condition.status}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                section.classList.add('hidden');
+            }
+            
+            document.getElementById('conditions-count').textContent = healthConditions.length;
+        }
+
+        // Medicine Management
+        function addMedicine() {
+            const name = document.getElementById('medicine-name').value;
+            const dosage = document.getElementById('medicine-dosage').value;
+            const frequency = document.getElementById('medicine-frequency').value;
+            const date = document.getElementById('medicine-date').value;
+            const notes = document.getElementById('medicine-notes').value;
+            
+            if (name && selectedCondition) {
+                medicines.push({
+                    id: Date.now(),
+                    name: name,
+                    dosage: dosage,
+                    frequency: frequency,
+                    condition: selectedCondition,
+                    startDate: date,
+                    notes: notes,
+                    addedDate: new Date().toISOString().split('T')[0]
+                });
+                
+                // Reset form
+                document.getElementById('medicine-name').value = '';
+                document.getElementById('medicine-dosage').value = '';
+                document.getElementById('medicine-frequency').value = '';
+                document.getElementById('medicine-date').value = '';
+                document.getElementById('medicine-notes').value = '';
+                document.getElementById('medicine-form').classList.add('hidden');
+                
+                updateMedicinesDisplay();
+                selectedCondition = '';
+            }
+        }
+
+        function cancelMedicineForm() {
+            document.getElementById('medicine-form').classList.add('hidden');
+            selectedCondition = '';
+        }
+
+        function updateMedicinesDisplay() {
+            const list = document.getElementById('medicines-list');
+            const count = document.getElementById('medicine-count');
+            const medicationsCount = document.getElementById('medications-count');
+            
+            count.textContent = medicines.length;
+            medicationsCount.textContent = medicines.length;
+            
+            if (medicines.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i data-lucide="heart" class="empty-icon"></i>
+                        <p class="empty-text">No medicines added yet</p>
+                        <span class="empty-link" onclick="switchTab('add-medicine')">Add your first medicine</span>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = `
+                    <div class="medicine-list">
+                        ${medicines.map(medicine => `
+                            <div class="medicine-item">
+                                <div class="medicine-content">
+                                    <div class="medicine-info">
+                                        <div class="medicine-icon">
+                                            <i data-lucide="heart"></i>
+                                        </div>
+                                        <div class="medicine-details">
+                                            <h3>${medicine.name}</h3>
+                                            <p class="medicine-meta">${medicine.dosage} • ${medicine.frequency}</p>
+                                            <p class="medicine-condition">For: ${medicine.condition}</p>
+                                        </div>
+                                    </div>
+                                    <div class="medicine-dates">
+                                        <p>Started: ${medicine.startDate || 'Not specified'}</p>
+                                        ${medicine.notes ? `<p style="font-size: 12px; color: #9ca3af; margin-top: 4px;">${medicine.notes}</p>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        // Initialize the app
+        function init() {
+            updateProfileDisplay();
+            updateConditionsDisplay();
+            updateMedicinesDisplay();
+        }
+
+        // Start the app
+        init();
+  </script>
+</body>
+
+</html>
